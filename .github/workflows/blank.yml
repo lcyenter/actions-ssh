@@ -1,10 +1,16 @@
-name: Ubuntu
-on:
-  watch:
-    types: started
+name: remote ssh command
+on: [push]
 jobs:
-  Ubuntu:
+
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: SSH connection to Actions
-      uses: P3TERX/debugger-action@master
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: whoami
