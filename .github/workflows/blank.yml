@@ -1,28 +1,17 @@
-name: Command via SSH
+name: deploy
 
-on: push
+on: [push]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: ls -a via OPEN SSH Private Key
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: ls -a
-          host: ${{ secrets.HOST }}
-          username: garygrossgarten
-          passphrase: ${{ secrets.PASSPHRASE }}
-          privateKey: ${{ secrets.PRIVATE_KEY}}
-      - name: this step should fail
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: node fail.js
-          host: ${{ secrets.HOST }}
-          username: garygrossgarten
-          passphrase: ${{ secrets.PASSPHRASE }}
-          privateKey: ${{ secrets.PRIVATE_KEY}}
-
-        env:
-          CI: true
+    - name: init ssh, deploy
+      run: |
+        eval $(ssh-agent -s)
+        echo "${{secrets.SERVER_SSH_PRIV_KEY}}" > deploy.key
+        mkdir -p ~/.ssh
+        chmod 0600 deploy.key
+        ssh-add deploy.key
+        echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+        ssh root@${{secrets.SERVER_IP}} "cd /your/workspace/path && sh update.sh "
