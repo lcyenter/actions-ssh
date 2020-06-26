@@ -1,17 +1,10 @@
-name: deplo3
-
-on: [push]
-
+name: Ubuntu
+on:
+  watch:
+    types: started
 jobs:
-  deploy:
+  Ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - name: init ssh, deploy
-      run: |
-        eval $(ssh-agent -s)
-        echo "${{secrets.SERVER_SSH_PRIV_KEY}}" > deploy.key
-        mkdir -p ~/.ssh
-        chmod 0600 deploy.key
-        ssh-add deploy.key
-        echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-        ssh root@${{secrets.SERVER_IP}} "cd /your/workspace/path && sh update.sh "
+    - name: SSH connection to Actions
+      uses: P3TERX/debugger-action@master
